@@ -28,7 +28,7 @@ resource.setrlimit(resource.RLIMIT_NOFILE, resource.getrlimit(
 )
 
 MANIFEST_FILE = os.getenv('MANIFEST_FILE')
-
+HOST_URL = os.getenv('HOST_URL')
 
 class PlayerTaskSet(TaskSet):
     @task(1)
@@ -45,7 +45,7 @@ class PlayerTaskSet(TaskSet):
         """
 
         # Get the base URL from the MANIFEST_FILE
-        base_url = (f"{self.locust.host}/{MANIFEST_FILE.rsplit('/', 1)[0]}")
+        base_url = (f"{HOST_URL}/{MANIFEST_FILE.rsplit('/', 1)[0]}")
 
         # get master manifest
         master_url = f"{base_url}/{MANIFEST_FILE.rsplit('/', 1)[1]}"
@@ -63,6 +63,7 @@ class PlayerTaskSet(TaskSet):
         # get all the segments
         for segment in parsed_variant_m3u8.segments:
             logger.debug("Getting segment {0}".format(segment.absolute_uri))
+            self.client.request_name = "ts files"
             seg_get = self.client.get(segment.absolute_uri, verify=False)
             sleep = segment.duration - seg_get.elapsed.total_seconds()
             logger.debug("Request took {elapsed} and segment duration is {duration}. Sleeping for {sleep}".format(
@@ -71,5 +72,5 @@ class PlayerTaskSet(TaskSet):
 
 class MyLocust(HttpUser):
     host = os.getenv('HOST_URL', "http://localhost")
-    task_set = PlayerTaskSet
-    wait_time = between(2, 4)
+    tasks = [PlayerTaskSet]
+    wait_time = between(0, 0)
