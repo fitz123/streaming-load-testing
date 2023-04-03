@@ -49,7 +49,7 @@ class PlayerTaskSet(TaskSet):
 
         # get master manifest
         master_url = f"{base_url}/{MANIFEST_FILE.rsplit('/', 1)[1]}"
-        master_m3u8 = self.client.get(master_url, name="merged", verify=False)
+        master_m3u8 = self.client.get(master_url, name="playlist", verify=False)
         parsed_master_m3u8 = m3u8.M3U8(content=master_m3u8.text, base_uri=base_url)
 
         # get the playlist URI from the master manifest
@@ -57,14 +57,13 @@ class PlayerTaskSet(TaskSet):
 
         # replace the playlist URI with the chunks URI to get the variant URL
         variant_url = f"{base_url}/{variant_uri}"
-        variant_m3u8 = self.client.get(variant_url, name="merged", verify=False)
+        variant_m3u8 = self.client.get(variant_url, name="chunks", verify=False)
         parsed_variant_m3u8 = m3u8.M3U8(content=variant_m3u8.text, base_uri=base_url)
 
         # get all the segments
         for segment in parsed_variant_m3u8.segments:
             logger.debug("Getting segment {0}".format(segment.absolute_uri))
-            self.client.request_name = "ts files"
-            seg_get = self.client.get(segment.absolute_uri, verify=False)
+            seg_get = self.client.get(segment.absolute_uri, name="ts files" ,verify=False)
             sleep = segment.duration - seg_get.elapsed.total_seconds()
             logger.debug("Request took {elapsed} and segment duration is {duration}. Sleeping for {sleep}".format(
                 elapsed=seg_get.elapsed.total_seconds(), duration=segment.duration, sleep=sleep))
