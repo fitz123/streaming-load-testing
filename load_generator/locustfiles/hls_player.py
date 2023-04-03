@@ -10,7 +10,7 @@
 ##################################################
 
 import os
-from locust import HttpLocust, TaskSet, task, between
+from locust import HttpUser, TaskSet, task, between
 import m3u8
 import logging
 import resource
@@ -44,30 +44,32 @@ class PlayerTaskSet(TaskSet):
         everything into a single name
         """
 
-        base_url = (f"{self.locust.host}/{MANIFEST_FILE}")
+        # Get the base URL from the MANIFEST_FILE
+        base_url = (f"{self.locust.host}/{MANIFEST_FILE.rsplit('/', 1)[0]}")
 
-        # get manifest
-        # single content
-        master_url = f"{base_url}/.m3u8"
-        master_m3u8 = self.client.get(master_url, name="merged")
+        # get master manifest
+        master_url = f"{base_url}/{MANIFEST_FILE.rsplit('/', 1)[1]}"
+        master_m3u8 = self.client.get(master_url, name="merged", verify=False)
         parsed_master_m3u8 = m3u8.M3U8(content=master_m3u8.text, base_uri=base_url)
 
-        random_variant = random.choice(parsed_master_m3u8.playlists)
-        variant_url = "{base_url}/{variant}".format(base_url=base_url, variant=random_variant.uri)
-        variant_m3u8 = self.client.get(variant_url, name="merged")
+        # get the playlist URI from the master manifest
+        variant_uri = parsed_master_m3u8.playlists[0].uri
+
+        # replace the playlist URI with the chunks URI to get the variant URL
+        variant_url = f"{base_url}/{variant_uri}"
+        variant_m3u8 = self.client.get(variant_url, name="merged", verify=False)
         parsed_variant_m3u8 = m3u8.M3U8(content=variant_m3u8.text, base_uri=base_url)
 
         # get all the segments
         for segment in parsed_variant_m3u8.segments:
             logger.debug("Getting segment {0}".format(segment.absolute_uri))
-            seg_get = self.client.get(segment.absolute_uri)
+            seg_get = self.client.get(segment.absolute_uri, verify=False)
             sleep = segment.duration - seg_get.elapsed.total_seconds()
             logger.debug("Request took {elapsed} and segment duration is {duration}. Sleeping for {sleep}".format(
                 elapsed=seg_get.elapsed.total_seconds(), duration=segment.duration, sleep=sleep))
             self._sleep(sleep)
 
-
-class MyLocust(HttpLocust):
+class MyLocust(HttpUser):
     host = os.getenv('HOST_URL', "http://localhost")
     task_set = PlayerTaskSet
-    wait_time = between(0, 0)
+    wait_time = between(2, 4)
