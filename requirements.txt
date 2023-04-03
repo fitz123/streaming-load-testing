@@ -1,8 +1,10 @@
 pytest
 coverage
-locustio==0.14.4
+locust>=2.15.1
 mpegdash==0.2.0
 m3u8==0.3.6
 requests==2.23.0
+gevent>= 22.10.2
+greenlet >= 2.0.2
 
 -e .
