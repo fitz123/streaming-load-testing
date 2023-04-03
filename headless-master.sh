@@ -1,0 +1,1 @@
+HOST_URL=https://live-sg-p2:8026     MANIFEST_FILE=/-3P1C_61M80WaGUOQObzIQ/9999999999/live/origin/fr-eurosport2_480/playlist.m3u8     mode=live     play_mode=full_playback     bitrate=lowest_bitrate     locust -f load_generator/locustfiles/hls_player.py     --headless --spawn-rate 70 --users 4500 --run-time 600s --only-summary --master --enable-rebalancing --reset-stats

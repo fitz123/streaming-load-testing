@@ -1,0 +1,1 @@
+while true; do HOST_URL=https://live-sg-p2:8026     MANIFEST_FILE=/-3P1C_61M80WaGUOQObzIQ/9999999999/live/origin/fr-eurosport2_480/playlist.m3u8     mode=live     play_mode=full_playback     locust -f load_generator/locustfiles/hls_player.py    --worker --reset-stats; done
