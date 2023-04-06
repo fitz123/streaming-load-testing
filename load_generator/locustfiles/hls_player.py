@@ -10,7 +10,7 @@
 ##################################################
 
 import os
-from locust import HttpUser, TaskSet, task, between
+from locust import FastHttpUser, TaskSet, task, between
 import m3u8
 import logging
 import resource
@@ -65,12 +65,12 @@ class PlayerTaskSet(TaskSet):
         for segment in parsed_variant_m3u8.segments:
             logger.debug("Getting segment {0}".format(segment.absolute_uri))
             seg_get = self.client.get(segment.absolute_uri, name="ts files" ,verify=False)
-            sleep = segment.duration - seg_get.elapsed.total_seconds()
-            logger.debug("Request took {elapsed} and segment duration is {duration}. Sleeping for {sleep}".format(
-                elapsed=seg_get.elapsed.total_seconds(), duration=segment.duration, sleep=sleep))
+            sleep = segment.duration - random.uniform(0, 1)
+            logger.debug("Segment duration is {duration}. Sleeping for {sleep}".format(
+                duration=segment.duration, sleep=sleep))
             self._sleep(sleep)
 
-class MyLocust(HttpUser):
+class MyLocust(FastHttpUser):
     host = os.getenv('HOST_URL', "http://localhost")
     tasks = [PlayerTaskSet]
     wait_time = between(0, 0)
