@@ -28,7 +28,7 @@ resource.setrlimit(resource.RLIMIT_NOFILE, resource.getrlimit(
 )
 
 MANIFEST_FILE = os.getenv('MANIFEST_FILE')
-HOST_URL = os.getenv('HOST_URL')
+HOST_PORT = os.getenv('HOST_PORT')
 
 class PlayerTaskSet(TaskSet):
     """
@@ -43,7 +43,7 @@ class PlayerTaskSet(TaskSet):
     """
     def on_start(self):
         # Get the base URL from the MANIFEST_FILE
-        base_url = (f"{HOST_URL}/{MANIFEST_FILE.rsplit('/', 1)[0]}")
+        base_url = (f"{MyLocust.host}:{HOST_PORT}/{MANIFEST_FILE.rsplit('/', 1)[0]}")
 
         # get master manifest
         master_url = f"{base_url}/{MANIFEST_FILE.rsplit('/', 1)[1]}"
@@ -53,7 +53,7 @@ class PlayerTaskSet(TaskSet):
     @task(1)
     def play_stream(self):
         # Get the base URL from the MANIFEST_FILE
-        base_url = (f"{HOST_URL}/{MANIFEST_FILE.rsplit('/', 1)[0]}")
+        base_url = (f"{MyLocust.host}:{HOST_PORT}/{MANIFEST_FILE.rsplit('/', 1)[0]}")
 
         # get the chunks URI from the master manifest
         variant_uri = self.parsed_master_m3u8.playlists[0].uri
@@ -71,6 +71,5 @@ class PlayerTaskSet(TaskSet):
             self._sleep(sleep)
 
 class MyLocust(FastHttpUser):
-    host = os.getenv('HOST_URL', "http://localhost")
     tasks = [PlayerTaskSet]
     wait_time = between(0, 0)
