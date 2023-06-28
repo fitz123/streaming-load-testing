@@ -1,27 +1,10 @@
-FROM python:3.6-alpine3.13
-LABEL maintainer "Roberto Ramos <roberto@unified-streaming.com>"
+from locustio/locust:latest
 
-# Install packages
-RUN apk --no-cache add g++ zeromq-dev libffi-dev file make gcc musl-dev \
- && rm -f /var/cache/apk/*
+WORKDIR /opt/streamrapist
 
-# Copy locust and load emulation requirements
-COPY requirements.txt /
-COPY setup.py /
-COPY README.rst /
-COPY load_generator /load_generator
+COPY requirements.txt /opt/streamrapist
 
+RUN pip3 install --upgrade pip && \
+    pip3 install -r requirements.txt
 
-RUN apk add --no-cache -U --virtual build-deps \
-      g++ \
-    && python -m pip install --upgrade pip \
-    && pip3 install -r /requirements.txt \
-    && apk del build-deps \
-    && rm -f /var/cache/apk/*
-
-WORKDIR /load_generator
-
-EXPOSE 8089 5557
-
-
-ENTRYPOINT ["locust"]
+COPY load_generator /opt/streamrapist/load_generator

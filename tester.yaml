@@ -1,0 +1,85 @@
+---
+- hosts: all
+  become: true
+  vars:
+    master_host: cs-c1-06
+  tasks:
+  - name: force to use ipv4 for apt
+    copy:
+      dest: "/etc/apt/apt.conf.d/99force-ipv4"
+      content: "Acquire::ForceIPv4 \"true\";\n"
+  - name: install requirements
+    become: true
+    apt:
+      name: "{{ item }}"
+    loop:
+    - python3-pip
+    - python3-locust
+  - name: allow change ulimits for a test user
+    copy:
+      dest: "/etc/ssh/sshd_config.d/99-no-UsePrivilegeSeparation"
+      content: "UsePrivilegeSeparation no\n"
+    notify: restart sshd
+  - name: Add or modify nofile soft limit for the user
+    pam_limits:
+      domain: ninja
+      limit_type: soft
+      limit_item: nofile
+      value: 65534
+  - name: git checkout of test load
+    become: false
+    git:
+      repo: https://github.com/fitz123/streaming-load-testing.git
+      dest: /home/ninja/streaming-load-testing
+    tags: repo
+  - name: requirements
+    become: false
+    pip:
+      name:
+      - pytest
+      - coverage
+      - locust>=2.15.1
+      - mpegdash==0.2.0
+      - m3u8==0.3.6
+        #- requests>=2.23.0
+      - requests
+      - gevent>= 22.10.2
+      - greenlet >= 2.0.2
+    tags: reqs
+      #- name: Install specified python requirements
+      #  become: false
+      #  pip:
+      #    requirements: /home/ninja/streaming-load-testing/requirements.txt
+      #    extra_args: --user
+      #  tags: reqs
+  - name: hosts
+    tags: hosts
+    blockinfile:
+      path: /etc/hosts
+      block: |
+        112.121.154.26  live-sg-p2
+        112.121.154.25  live-sg-p1
+        147.50.247.101  cs-c1-01
+        147.50.247.102  cs-c1-02
+        147.50.247.103  cs-c1-03
+        147.50.247.104  cs-c1-04
+        147.50.247.105  cs-c1-05
+        147.50.247.106  cs-c1-06
+        147.50.247.107  cs-c1-07
+        147.50.247.108  cs-c1-08
+        147.50.247.109  cs-c1-09
+        147.50.247.110  cs-c1-10
+  - name: run.sh
+    become: false
+    copy:
+      dest: /home/ninja/streaming-load-testing/run1.sh
+      content: "HOST_PORT=8026 MANIFEST_FILE=/{{ token }}/9999999999/live/origin/fr-eurosport2_480/playlist.m3u8 mode=live play_mode=only_manifest locust -f load_generator/locustfiles/hls_player.py --enable-rebalancing --worker --reset-stats --master-host={{ master_host }} --master-port={{ master_port }}"
+      mode: u+x
+    tags: run1
+
+  handlers:
+  - name: restart sshd
+    service:
+      name: sshd
+      state: restarted
+
