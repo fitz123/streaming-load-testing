@@ -8,14 +8,16 @@
 # Email: mark@unified-streaming.com
 # Maintainer: roberto@unified-streaming.com
 ##################################################
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import os
 from locust import HttpUser, TaskSet, task, between
 import m3u8
-import logging
 import resource
 import sys
 import random
+import logging
 
 if sys.version_info[0] < 3:
     raise Exception("Must be using Python 3")
@@ -61,14 +63,14 @@ class PlayerTaskSet(TaskSet):
         variant_m3u8 = self.client.get(variant_url, name="chunks", verify=False)
         parsed_variant_m3u8 = m3u8.M3U8(content=variant_m3u8.text, base_uri=base_url)
 
-        ## get all the segments
-        #for segment in parsed_variant_m3u8.segments:
-        #    logger.debug("Getting segment {0}".format(segment.absolute_uri))
-        #    seg_get = self.client.get(segment.absolute_uri, name="ts files" ,verify=False)
-        #    sleep = segment.duration - seg_get.elapsed.total_seconds()
-        #    logger.debug("Request took {elapsed} and segment duration is {duration}. Sleeping for {sleep}".format(
-        #        elapsed=seg_get.elapsed.total_seconds(), duration=segment.duration, sleep=sleep))
-        #    self._sleep(sleep)
+        # get all the segments
+        for segment in parsed_variant_m3u8.segments:
+            logger.debug("Getting segment {0}".format(segment.absolute_uri))
+            seg_get = self.client.get(segment.absolute_uri, name="ts files" ,verify=False)
+            sleep = segment.duration - seg_get.elapsed.total_seconds()
+            logger.debug("Request took {elapsed} and segment duration is {duration}. Sleeping for {sleep}".format(
+                elapsed=seg_get.elapsed.total_seconds(), duration=segment.duration, sleep=sleep))
+            self._sleep(sleep)
 
 class MyLocust(HttpUser):
     host = os.getenv('HOST_URL', "http://localhost")
