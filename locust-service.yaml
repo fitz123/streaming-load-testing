@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust-inventory-master-service
+  labels:
+    name: locust-inventory-master-service
+spec:
+  type: LoadBalancer
+  selector:
+    name: locust-inventory-master
+    role: master
+  ports:
+    - port: 8089
+      protocol: TCP
+      name: locust-inventory-master-web
+    - port: 5557
+      protocol: TCP
+      name: locust-inventory-master-port-1
+    - port: 5558
+      protocol: TCP
+      name: locust-inventory-master-port-2

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-inventory-worker
+  labels:
+    name: locust-inventory-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locust-inventory-worker
+  template:
+    metadata:
+      labels:
+        app: locust-inventory-worker
+        name: locust-inventory-worker
+        role: worker
+    spec:
+      containers:
+        - name: locust-inventory-worker
+          image: 10.98.0.201:5000/custom-locust:26 # Locust version
+          resources:
+            limits:
+              cpu: 1900m
+            requests:
+              cpu: 900m
+          env:
+            - name: LOCUST_LOGLEVEL
+              value: "DEBUG"
+            - name: LOCUST_MODE_WORKER
+              value: "true"
+            - name: LOCUST_MASTER_NODE_HOST
+              value: locust-inventory-master-service # Master Deployment Name
+            - name: LOCUST_LOCUSTFILE
+              value: load_generator/locustfiles/hls_player.py
+            - name: LOCUST_HOST
+              value: "http://0.0.0.0:8009"
+            - name: HOST_PORT
+              value: "8182"
+            - name: CHANNEL_URI
+              value: "live/v1-origin/dooball66-tsporthd1_720"

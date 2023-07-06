@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locust-inventory-master
+  labels:
+    name: locust-inventory-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: locust-inventory-master
+  template:
+    metadata:
+      labels:
+        app: locust-inventory-master
+        name: locust-inventory-master
+        role: master
+    spec:
+      containers:
+        - name: locust-inventory-master
+          image: 10.98.0.201:5000/custom-locust:26 # Put you Docker Image Here
+          resources:
+            limits:
+              cpu: 1900m
+            requests:
+              cpu: 900m
+          env:
+            - name: LOCUST_LOGLEVEL
+              value: "DEBUG"
+            - name: LOCUST_MODE_MASTER
+              value: "true"
+            - name: LOCUST_EXPECT_WORKERS
+              value: "1"
+            - name: LOCUST_LOCUSTFILE
+              value: load_generator/locustfiles/hls_player.py
+            - name: LOCUST_HOST
+              value: "http://0.0.0.0:8009"
+            - name: HOST_PORT
+              value: "8182"
+            - name: CHANNEL_URI
+              value: "live/v1-origin/dooball66-tsporthd1_720"
+          ports:
+            - name: loc-master-web
+              containerPort: 8089
+              protocol: TCP
+            - name: loc-master-p1
+              containerPort: 5557
+              protocol: TCP
+            - name: loc-master-p2
+              containerPort: 5558
+              protocol: TCP
