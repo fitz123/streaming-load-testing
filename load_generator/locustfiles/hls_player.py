@@ -30,6 +30,9 @@ class PlayerTaskSet(TaskSet):
     # This task set plays complete stream.
 
     def on_start(self):
+        # Split the provided LOCUST_HOST string into a list of IPs
+        self.ip_list = self.user.environment.host.split(',')
+
         # Calculate ticket and user_id for each user starting to play stream
         secret = 'secret'  # replace with your actual secret
         self.user_id = str(uuid.uuid4()).lower()
@@ -39,7 +42,9 @@ class PlayerTaskSet(TaskSet):
         logger.debug(f"Ticket is: {self.ticket}")
 
         # Define base URL
-        self.base_url = f"{MyLocust.host}:{HOST_PORT}/v4/{self.ticket}/9999999999/{self.user_id}/{self.ticket}/9999999999/{CHANNEL_URI}"
+        # Here we are choosing a random IP from the list
+        chosen_ip = random.choice(self.ip_list)
+        self.base_url = f"https://{chosen_ip}:{HOST_PORT}/v4/{self.ticket}/9999999999/{self.user_id}/{self.ticket}/9999999999/{CHANNEL_URI}"
 
         # Get master manifest
         master_url = f"{self.base_url}/playlist.m3u8"

@@ -18,10 +18,8 @@ spec:
     spec:
       containers:
         - name: locust-inventory-master
-          image: 10.98.0.201:5000/custom-locust:26 # Put you Docker Image Here
+          image: 10.98.0.201:5000/custom-locust:28 # Put you Docker Image Here
           resources:
-            limits:
-              cpu: 1900m
             requests:
               cpu: 900m
           env:
@@ -34,7 +32,7 @@ spec:
             - name: LOCUST_LOCUSTFILE
               value: load_generator/locustfiles/hls_player.py
             - name: LOCUST_HOST
-              value: "http://0.0.0.0:8009"
+              value: "147.50.247.101"
             - name: HOST_PORT
               value: "8182"
             - name: CHANNEL_URI
