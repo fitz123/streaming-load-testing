@@ -32,11 +32,11 @@ spec:
             - name: LOCUST_LOCUSTFILE
               value: load_generator/locustfiles/hls_player.py
             - name: LOCUST_HOST
-              value: "147.50.247.101"
+              value: "112.121.154.10"
             - name: HOST_PORT
               value: "8182"
             - name: CHANNEL_URI
-              value: "live/v1-origin/dooball66-tsporthd1_720"
+              value: "live/lx-origin/dooball66-bein1_720"
           ports:
             - name: loc-master-web
               containerPort: 8089
@@ -47,3 +47,8 @@ spec:
             - name: loc-master-p2
               containerPort: 5558
               protocol: TCP
+      nodeName: "locust-ctrl"
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"

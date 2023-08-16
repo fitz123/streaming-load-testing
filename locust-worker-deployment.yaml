@@ -23,7 +23,7 @@ spec:
             limits:
               cpu: 1900m
             requests:
-              cpu: 900m
+              cpu: 1
           env:
             - name: LOCUST_LOGLEVEL
               value: "DEBUG"
@@ -34,8 +34,8 @@ spec:
             - name: LOCUST_LOCUSTFILE
               value: load_generator/locustfiles/hls_player.py
             - name: LOCUST_HOST
-              value: "147.50.247.101"
+              value: "112.121.154.10"
             - name: HOST_PORT
               value: "8182"
             - name: CHANNEL_URI
-              value: "live/v1-origin/dooball66-tsporthd1_720"
+              value: "live/lx-origin/dooball66-bein1_720"
