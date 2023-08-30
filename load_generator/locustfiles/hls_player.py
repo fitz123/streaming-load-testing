@@ -58,9 +58,10 @@ class PlayerTaskSet(TaskSet):
         # Get variant URI from the master manifest
         variant_uri = self.parsed_master_m3u8.playlists[0].uri
 
-        # Fetch variant m3u8 file
-        variant_m3u8 = self.client.get(f"{self.base_url}/{variant_uri}", name="chunks", verify=False)
-        parsed_variant_m3u8 = m3u8.M3U8(content=variant_m3u8.text, base_uri=self.base_url)
+        # Fetch variant m3u8 twice
+        for _ in range(2):
+            variant_m3u8 = self.client.get(f"{self.base_url}/{variant_uri}", name="chunks", verify=False)
+            parsed_variant_m3u8 = m3u8.M3U8(content=variant_m3u8.text, base_uri=self.base_url)
 
         # Get all the segments and sleep for the duration of each segment
         segments_to_iterate = 1 if random.random() > 0.1 else 2  # 0-10% chance of choosing 2 segments

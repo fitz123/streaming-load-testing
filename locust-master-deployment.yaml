@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: locust-inventory-master
-          image: 10.98.0.201:5000/custom-locust:29 # Put you Docker Image Here
+          image: 10.98.0.201:5000/custom-locust:33 # Put you Docker Image Here
           resources:
             requests:
               cpu: 900m

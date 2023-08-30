@@ -16,12 +16,11 @@ spec:
         name: locust-inventory-worker
         role: worker
     spec:
+      terminationGracePeriodSeconds: 5
       containers:
         - name: locust-inventory-worker
-          image: 10.98.0.201:5000/custom-locust:29 # Locust version
+          image: 10.98.0.201:5000/custom-locust:33 # Locust version
           resources:
-            limits:
-              cpu: 1900m
             requests:
               cpu: 1
           env:
