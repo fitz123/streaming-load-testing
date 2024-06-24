@@ -33,8 +33,8 @@ spec:
             - name: LOCUST_LOCUSTFILE
               value: load_generator/locustfiles/hls_player.py
             - name: LOCUST_HOST
-              value: "112.121.154.10"
+              value: "112.121.154.21"
             - name: HOST_PORT
               value: "8182"
             - name: CHANNEL_URI
-              value: "live/lx-origin/dooball66-epl1_720"
+              value: "live/lx-origin/uflix-epl1x_720"
